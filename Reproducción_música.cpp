@@ -1,24 +1,48 @@
 #include <iostream>
 #include <string>
+#include <ctime> // Libreria para fecha y hora
 
 using namespace std;
 
-// Aquí se va a crear las canciónes
+// Estructura de la canción
 struct Cancion {
     string nombre;
     string artista;
     string duracion;
 
+    // Fecha y hora cuando se reproduce
+    string fechaHora;
+
     Cancion* siguiente;
     Cancion* anterior;
 };
 
-// Aqui estructuramos la Lista
+// Lista circular
 Cancion* inicio = NULL;
 Cancion* fin = NULL;
 
+// Función para obtener fecha y hora actual
+string obtenerFechaHora() {
+
+    time_t ahora = time(0);
+    tm* tiempo = localtime(&ahora);
+
+    string fecha =
+        to_string(tiempo->tm_mday) + "/" +
+        to_string(tiempo->tm_mon + 1) + "/" +
+        to_string(tiempo->tm_year + 1900) + " ";
+
+    string hora =
+        to_string(tiempo->tm_hour) + ":" +
+        to_string(tiempo->tm_min) + ":" +
+        to_string(tiempo->tm_sec);
+
+    return fecha + hora;
+}
+
 // Función para agregar canción
 void agregarCancion() {
+
     Cancion* nueva = new Cancion();
 
     cin.ignore();
@@ -32,8 +56,11 @@ void agregarCancion() {
     cout << "Duracion: ";
     getline(cin, nueva->duracion);
 
+    nueva->fechaHora = "Aun no reproducida";
+
     // Si la lista está vacía
     if (inicio == NULL) {
+
         inicio = nueva;
         fin = nueva;
 
@@ -41,6 +68,7 @@ void agregarCancion() {
         nueva->anterior = nueva;
     }
     else {
+
         fin->siguiente = nueva;
         nueva->anterior = fin;
 
@@ -53,7 +81,7 @@ void agregarCancion() {
     cout << "\nCancion agregada correctamente.\n";
 }
 
-// se mostrara las canciones 
+// Mostrar lista completa
 void mostrarLista() {
 
     if (inicio == NULL) {
@@ -66,16 +94,18 @@ void mostrarLista() {
     cout << "\n--- PLAYLIST ---\n";
 
     do {
+
         cout << "\nNombre: " << aux->nombre << endl;
         cout << "Artista: " << aux->artista << endl;
         cout << "Duracion: " << aux->duracion << endl;
+        cout << "Ultima reproduccion: " << aux->fechaHora << endl;
 
         aux = aux->siguiente;
 
     } while (aux != inicio);
 }
 
-// Aqui se mostrara las respruducciones 
+// Reproducir playlist
 void reproducirPlaylist() {
 
     if (inicio == NULL) {
@@ -87,10 +117,15 @@ void reproducirPlaylist() {
     char opcion;
 
     do {
+
+        // Guardar fecha y hora actual
+        actual->fechaHora = obtenerFechaHora();
+
         cout << "\n--- REPRODUCIENDO ---\n";
         cout << "Nombre: " << actual->nombre << endl;
         cout << "Artista: " << actual->artista << endl;
         cout << "Duracion: " << actual->duracion << endl;
+        cout << "Fecha y hora: " << actual->fechaHora << endl;
 
         cout << "\n[d] Siguiente";
         cout << "\n[a] Anterior";
@@ -108,12 +143,13 @@ void reproducirPlaylist() {
     } while (opcion != 's');
 }
 
-// esta opcion ya seria el  Menú principal
+// Menú principal
 int main() {
 
     int opcion;
 
     do {
+
         cout << "\n===== REPRODUCTOR DE MUSICA =====\n";
         cout << "1. Agregar cancion\n";
         cout << "2. Mostrar lista completa\n";
